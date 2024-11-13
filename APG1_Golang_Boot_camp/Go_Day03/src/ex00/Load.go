@@ -1,5 +1,7 @@
 // curl -s -XGET "http://localhost:9200/places"
 // curl -X DELETE "localhost:9200/places?pretty"
+// curl -s -XGET "http://localhost:9200/places/_doc/1
+// curl -s -XGET "http://localhost:9200/places/_search"
 
 package main
 
@@ -8,13 +10,11 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
-	// "github.com/gocarina/gocsv"
-	// "io"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -24,7 +24,7 @@ import (
 )
 
 type Place struct {
-	ID       int
+	ID       int      `csv:"-" json:"id"`
 	Name     string   `csv:"Name" json:"name"`
 	Address  string   `csv:"Address" json:"address"`
 	Phone    string   `csv:"Phone" json:"phone"`
@@ -35,12 +35,6 @@ type GeoPoint struct {
 	Lat float64 `json:"lat"`
 	Lon float64 `json:"lon"`
 }
-
-var (
-	indexName  string
-	numWorkers int
-	flushBytes int
-)
 
 var (
 	countSuccessful uint64
@@ -54,7 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	indexName = "place"
+	indexName := "places"
 	mapping :=
 		`{
 		"settings": {
@@ -78,6 +72,9 @@ func main() {
 		  }
 		}
 	  }`
+
+	numWorkers := 5
+	flushBytes := 5e+6
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
 		Index:         indexName,
 		Client:        client,
