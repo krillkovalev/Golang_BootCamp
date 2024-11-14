@@ -1,5 +1,3 @@
-// curl -s -XGET "http://localhost:9200/places"
-// curl -X DELETE "localhost:9200/places?pretty"
 // curl -s -XGET "http://localhost:9200/places/_doc/1
 // curl -s -XGET "http://localhost:9200/places/_search"
 
