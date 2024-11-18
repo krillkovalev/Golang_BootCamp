@@ -11,7 +11,9 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -24,20 +26,37 @@ type Store interface {
 	GetPlaces(limit int, offset int) ([]types.Place, int, error)
 }
 
-func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
+type PlacesRepository struct {
+	esBaseURL string
+}
+
+func (p *PlacesRepository) GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 	esReq := map[string]int{
 		"size": 10,
 	}
 
 	if limit > 0 {
-		esReq["limit"] = limit
+		esReq["size"] = limit
 	}
 
 	if offset > 0 {
-		esReq["offset"] = offset
+		esReq["from"] = offset
 	}
 
 	url := "http://localhost:9200/places/_search"
+
+	SearchHits := types.SearchHits{}
+	err := p.SendRequest(url, esReq, &SearchHits)
+	if err != nil {
+		w.Write
+	}
+
+	PlacesList := []types.Place{}
+	for _, hit := range SearchHits.Hits.Hits {
+		PlacesList = append(PlacesList, hit.Source)
+	}
+
+	return PlacesList, SearchHits.Hits.Total.Value, nil
 
 }
 
@@ -111,7 +130,9 @@ func ReadCsv(filename string) ([]types.Place, error) {
 
 func CreateIndex(indexName string, mapping string, client *elasticsearch.Client) {
 
-	if res, err = client.Indices.Delete([]string{indexName}, client.Indices.Delete.WithIgnoreUnavailable(true)); err != nil || res.IsError() {
+	var res *esapi.Response
+
+	if res, err := client.Indices.Delete([]string{indexName}, client.Indices.Delete.WithIgnoreUnavailable(true)); err != nil || res.IsError() {
 		log.Fatalf("Cannot delete index: %s", err)
 	}
 	res.Body.Close()
