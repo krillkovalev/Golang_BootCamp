@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/elastic/go-elasticsearch/v8/esutil"
+// "github.com/elastic/go-elasticsearch/v8/esutil"
 )
 
 type Place struct {
@@ -15,4 +15,10 @@ type Place struct {
 type GeoPoint struct {
 	Lat float64 `json:"lat"`
 	Lon float64 `json:"lon"`
+}
+
+type Result struct {
+	Name    string `csv:"Name" json:"name"`
+	Address string `csv:"Address" json:"address"`
+	Phone   string `csv:"Phone" json:"phone"`
 }
