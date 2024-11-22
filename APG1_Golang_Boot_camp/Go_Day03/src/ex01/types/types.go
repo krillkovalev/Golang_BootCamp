@@ -1,9 +1,5 @@
 package types
 
-import (
-// "github.com/elastic/go-elasticsearch/v8/esutil"
-)
-
 type Place struct {
 	ID       int      `csv:"-" json:"id"`
 	Name     string   `csv:"Name" json:"name"`

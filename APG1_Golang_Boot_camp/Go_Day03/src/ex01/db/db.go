@@ -39,15 +39,9 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		log.Fatal(err)
 	}
 
-	esReq := map[string]int{
-		"size": 10,
-	}
-
-	if limit > 0 {
-		esReq["size"] = limit
-	}
-	if offset > 0 {
-		esReq["from"] = offset
+	esReq := map[string]interface{}{
+		"size":  10,
+		"limit": offset,
 	}
 
 	index := "places"
@@ -81,7 +75,7 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		log.Fatal(err)
 	}
 
-	for _, hit := range r["hits"].(map[string]interface{})["total"].([]interface{}) {
+	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
 		fmt.Printf("Source: %s\n", hit.(map[string]interface{})["_source"])
 	}
 
