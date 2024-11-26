@@ -40,8 +40,8 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 	}
 
 	esReq := map[string]interface{}{
-		"size":  10,
-		"limit": offset,
+		"size": limit,
+		"from": offset,
 	}
 
 	index := "places"

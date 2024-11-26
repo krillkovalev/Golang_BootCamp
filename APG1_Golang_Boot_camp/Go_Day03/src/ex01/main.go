@@ -1,14 +1,14 @@
 package main
 
 import (
-	"Interface/db"
-	// "encoding/json"
-	// "log"
-	// "net.http"
-	// "net/http"
-	// "strconv"
+	//"Interface/db"
+	"Interface/server"
+	"net/http"
 )
 
 func main() {
-	db.GetPlaces(10, 20)
+
+	http.HandleFunc("/", server.HandlePlaces)
+
+	http.ListenAndServe(":8888", nil)
 }

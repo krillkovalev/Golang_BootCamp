@@ -1,47 +1,37 @@
 package server
 
 import (
-	"fmt"
-	"io"
+	//"fmt"
+	//"html/template"
+	"Interface/db"
 	"log"
 	"net/http"
+	//"net/url"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
-const portNum string = ":8888"
-const keyServerAddr = "127.0.0.1"
+func HandlePlaces(w http.ResponseWriter, r *http.Request) {
+	client, err := elasticsearch.NewDefaultClient()
 
-func Homepage(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Api")
-}
+	client.Count(
+		client.Count.WithIndex("places"),
+	)
 
-func TurnOn() {
-
-	http.HandleFunc("/api/places", Homepage)
-
-	err := http.ListenAndServe(portNum, nil)
+	s := r.URL.Query().Get("page")
+	page, err := strconv.Atoi(s)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
+	if page < 1 {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 
-func writeResponseBadRequest(w http.ResponseWriter, response interface{}) {
-	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
-	writeResponse()
-}
+	limit := 10
+	offset := (page - 1) * 10
+	places, cnt, err := db.GetPlaces(limit, offset)
 
-func writeResponse(w http.ResponseWriter)
+	//totalpages :=
 
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	hasFirst := r.URL.Query().Has("first")
-	first := r.URL.Query().Get("first")
-	hasSecond := r.URL.Query().Has("second")
-	second := r.URL.Query().Get("second")
-
-	fmt.Printf("%s: got / request. first(%t)=%s, second(%t)=%s\n",
-		ctx.Value(keyServerAddr),
-		hasFirst, first,
-		hasSecond, second)
 }

@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Places</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<h5>Total: {{ .Total }}</h5>
+<ul>
+    {{ range .Places }}
+    <li>
+        <div>{{ .Name }}</div>
+        <div>{{ .Address }}</div>
+        <div>{{ .Phone }}</div>
+    </li>
+</ul>
+{{if ne .Page 1}}
+<a href="/?page=1">Previous</a>
+{{ end }}
+<a href="/?page={{add .Page 1}}">Next</a>
+<a href="/?page={{ .TotalPages }}">Last</a>
+</body>
+</html>
