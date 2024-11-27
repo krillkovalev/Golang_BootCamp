@@ -16,11 +16,14 @@
         <div>{{ .Address }}</div>
         <div>{{ .Phone }}</div>
     </li>
+    {{ end }}
 </ul>
-{{if ne .Page 1}}
-<a href="/?page=1">Previous</a>
+{{if gt .Page 1}}
+<a href="/?page={{minus .Page 1 }}">Previous</a>
 {{ end }}
-<a href="/?page={{add .Page 1}}">Next</a>
+{{if lt .Page .TotalPages}}
+<a href="/?page={{add 1 .Page }}">Next</a>
 <a href="/?page={{ .TotalPages }}">Last</a>
+{{ end }}
 </body>
 </html>

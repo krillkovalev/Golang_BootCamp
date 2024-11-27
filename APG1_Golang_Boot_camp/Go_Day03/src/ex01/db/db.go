@@ -23,7 +23,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
+	//"fmt"
 	"github.com/elastic/go-elasticsearch/v8"
 	"log"
 )
@@ -38,6 +38,18 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	result, err := es.Count(
+		es.Count.WithIndex("places"),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var response map[string]interface{}
+	if err := json.NewDecoder(result.Body).Decode(&response); err != nil {
+		log.Fatal(err)
+	}
+
+	total := response["count"].(float64)
 
 	esReq := map[string]interface{}{
 		"size": limit,
@@ -75,9 +87,9 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		log.Fatal(err)
 	}
 
-	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
-		fmt.Printf("Source: %s\n", hit.(map[string]interface{})["_source"])
-	}
+	// for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+	// 	fmt.Printf("Source: %s\n", hit.(map[string]interface{})["_source"])
+	// }
 
-	return nil, 0, err
+	return nil, int(total), err
 }
