@@ -87,9 +87,30 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		log.Fatal(err)
 	}
 
-	// for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
-	// 	fmt.Printf("Source: %s\n", hit.(map[string]interface{})["_source"])
-	// }
+	var places []types.Place
 
-	return nil, int(total), err
+	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+		source := hit.(map[string]interface{})["_source"]
+		data := types.Place{}
+		if sourceMap, ok := source.(map[string]interface{}); ok {
+			if id, ok := sourceMap["id"].(int); ok {
+				data.ID = id
+			}
+			if name, ok := sourceMap["name"].(string); ok {
+				data.Name = name
+			}
+			if phone, ok := sourceMap["phone"].(string); ok {
+				data.Phone = phone
+			}
+			if name, ok := sourceMap["address"].(string); ok {
+				data.Address = name
+			}
+			if location, ok := sourceMap["location"].(types.GeoPoint); ok {
+				data.Location = location
+			}
+		}
+		places = append(places, data)
+	}
+
+	return places, int(total), err
 }

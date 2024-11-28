@@ -3,10 +3,7 @@ package server
 import (
 	"Interface/db"
 	"Interface/types"
-	//"encoding/json"
-	"fmt"
 	"html/template"
-	"log"
 	"math"
 	"net/http"
 	"path/filepath"
@@ -18,16 +15,17 @@ func HandlePlaces(w http.ResponseWriter, r *http.Request) {
 	s := r.URL.Query().Get("page")
 	page, err := strconv.Atoi(s)
 	if err != nil {
-		log.Fatalf("Error to parse query: %s", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	if page < 1 {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	limit := 10
 	offset := (page - 1) * limit
 	places, total, err := db.GetPlaces(limit, offset)
-	fmt.Println(places)
 
 	totalpages := int(math.Round(float64(total) / float64(limit)))
 
@@ -49,12 +47,12 @@ func HandlePlaces(w http.ResponseWriter, r *http.Request) {
 	}).ParseFiles(path)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		log.Fatal(err)
+		return
 	}
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		log.Fatal(err)
+		return
 	}
 
 }
