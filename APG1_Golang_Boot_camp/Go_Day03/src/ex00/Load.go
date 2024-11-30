@@ -50,7 +50,8 @@ func main() {
 	mapping :=
 		`{
 		"settings": {
-		  "number_of_shards": 1
+		  "number_of_shards": 1,
+		  "max_result_window": 20000
 		},
 		"mappings": {
 		
