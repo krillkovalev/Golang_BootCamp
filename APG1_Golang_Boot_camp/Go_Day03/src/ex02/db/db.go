@@ -77,8 +77,8 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		source := hit.(map[string]interface{})["_source"]
 		data := types.Place{}
 		if sourceMap, ok := source.(map[string]interface{}); ok {
-			if id, ok := sourceMap["id"].(int); ok {
-				data.ID = id
+			if id, ok := sourceMap["id"].(float64); ok {
+				data.ID = int(id)
 			}
 			if name, ok := sourceMap["name"].(string); ok {
 				data.Name = name
@@ -89,9 +89,14 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 			if name, ok := sourceMap["address"].(string); ok {
 				data.Address = name
 			}
-			if location, ok := sourceMap["location"].(types.GeoPoint); ok {
-				data.Location = location
+			if location, ok := sourceMap["location"].(map[string]interface{}); ok {
+				lat := location["lat"].(float64)
+				data.Location.Lat = lat
+				lon := location["lon"].(float64)
+				data.Location.Lon = lon
 			}
+			
+			
 		}
 		fmt.Println(hit)
 		places = append(places, data)
