@@ -2,13 +2,12 @@ package main
 
 import (
 	"Interface/server"
-	"fmt"
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	router := gin.Default()
+	router.GET("/api/places", server.HandlePlaces)
+	router.Run("127.0.0.1:8888")
 
-	http.HandleFunc("/", server.HandlePlaces)
-	fmt.Println("server is running")
-	http.ListenAndServe(":8888", nil)
 }

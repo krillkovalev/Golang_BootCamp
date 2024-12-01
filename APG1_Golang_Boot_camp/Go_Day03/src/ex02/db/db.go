@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
@@ -100,3 +99,4 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 
 	return places, int(total), err
 }
+

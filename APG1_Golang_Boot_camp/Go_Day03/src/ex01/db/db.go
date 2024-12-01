@@ -23,7 +23,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	//"fmt"
+	"fmt"
 	"github.com/elastic/go-elasticsearch/v8"
 	"log"
 )
@@ -110,6 +110,7 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 			}
 		}
 		places = append(places, data)
+		fmt.Println(hit)
 	}
 
 	return places, int(total), err
