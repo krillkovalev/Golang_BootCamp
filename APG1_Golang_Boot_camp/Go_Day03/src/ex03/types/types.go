@@ -8,17 +8,10 @@ type Place struct {
 	Location GeoPoint `csv:"-" json:"location"`
 }
 
-type Request struct {
-	
-}
 
 type Response struct { 
-	Name 		string   `json:"name"`
-	Total 		int 	`json:"total"`
+	Name 		string     `json:"name"`
 	Places 		[]Place    `json:"places"`
-	Previous    int
-	Next		int
-	Last		int
 }
 
 type GeoPoint struct {

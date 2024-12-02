@@ -10,43 +10,44 @@ import (
 )
 
 
-
 func HandlePlaces(ctx *gin.Context) {
 	
-	s, present := ctx.GetQuery("page")
+	l, present := ctx.GetQuery("lat")
 	if !present {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Invalid 'page' value": s})
+		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	} 
 	
-	page, err := strconv.Atoi(s) 
+    lat, err := strconv.ParseFloat(l, 64)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Invalid 'page' value": s})
-		return
-	}
-	if page < 1 {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Invalid 'page' value": s})
+		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	limit := 10
-	offset := (page - 1) * limit
-	places, total, err := db.GetPlaces(limit, offset)
+	lo, exist := ctx.GetQuery("lon")
+	if !exist {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 	
-	if err != nil || page > total / limit {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Invalid 'page' value": s})
+	lon, err := strconv.ParseFloat(lo, 64)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	totalpages := (total + limit - 1) / limit
-	
+
+	limit := 3
+	places, err := db.GetPlaces(limit, lat, lon)
+
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
 	response := types.Response{
-		Name: 		"Places",
-		Total: 		total,
+		Name: 		"Recommendation",
 		Places:     places,
-		Previous:   page - 1,
-		Next: 		page + 1,
-		Last: 		totalpages,		
 	} 
 	ctx.JSON(http.StatusOK, response)
 }

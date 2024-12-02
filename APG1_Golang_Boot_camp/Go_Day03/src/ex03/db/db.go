@@ -14,10 +14,10 @@ import (
 
 type Store interface {
 	// returns a list of items, a total number of hits and (or) an error in case of one
-	GetPlaces(limit int, offset int) ([]types.Place, int, error)
+	GetPlaces(limit int) ([]types.Place, int, error)
 }
 
-func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
+func GetPlaces(limit int, lat float64, lon float64) ([]types.Place, error) {
 	es, err := elasticsearch.NewDefaultClient()
 	if err != nil {
 		log.Fatal(err)
@@ -32,42 +32,30 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 	if err := json.NewDecoder(result.Body).Decode(&response); err != nil {
 		log.Fatal(err)
 	}
-
-	total := response["count"].(float64)
-
+	
 	esReq := map[string]interface{}{
 		"size": limit,
-		"from": offset,
+		"sort": []interface{}{
+			map[string]interface{}{
+				"_geo_distance": map[string]interface{}{
+					"location": map[string]float64{
+						"lat": lon, //Видимо в индексе перепутаны lat и lon 
+						"lon": lat,	
+					},
+				"order": "asc",
+				"unit": "km",
+				"mode": "min",
+				"distance_type": "arc",
+				"ignore_unmapped": true,
+				},
+			},
+		},	
 	}
+	
 
 	index := "places"
 
 	es.Search()
-
-	res, err := es.Search(
-		es.Search.WithBody(strings.NewReader(`{
-	  "query": {
-	    "term": {
-	      "product": "chocolate"
-	    }
-	  },
-	  {
-      "_geo_distance": {
-        "location": {
-          "lat": 55.674,
-          "lon": 37.666
-        },
-        "order": "asc",
-        "unit": "km",
-        "mode": "min",
-        "distance_type": "arc",
-        "ignore_unmapped": true
-      }
-    }
-	}`)),
-		es.Search.WithPretty(),
-	)
-	fmt.Println(res, err)
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(esReq); err != nil {
@@ -127,6 +115,6 @@ func GetPlaces(limit int, offset int) ([]types.Place, int, error) {
 		places = append(places, data)
 	}
 
-	return places, int(total), err
+	return places, err
 }
 
