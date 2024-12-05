@@ -5,7 +5,7 @@ package restapi
 import (
 	"crypto/tls"
 	"net/http"
-
+	"slices"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
@@ -19,6 +19,13 @@ func configureFlags(api *operations.CandyServerAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
+func buyCandy(money int, candyType string, candyCount int) error {
+	candies := []string{"CE", "AA", "NT", "DE", "YR",}
+	if candyCount < 0 || !slices.Contains(candies, candyType) {
+		return operations.NewBuyCandyBadRequest().WithPayload(&BuyCandyPaymentRequiredBody.)
+	}
+}
+
 func configureAPI(api *operations.CandyServerAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
@@ -28,6 +35,7 @@ func configureAPI(api *operations.CandyServerAPI) http.Handler {
 	//
 	// Example:
 	// api.Logger = log.Printf
+
 
 	api.UseSwaggerUI()
 	// To continue using redoc as your UI, uncomment the following line
