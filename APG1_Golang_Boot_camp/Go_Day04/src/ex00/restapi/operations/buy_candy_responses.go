@@ -60,7 +60,7 @@ func (o *BuyCandyCreated) WriteResponse(rw http.ResponseWriter, producer runtime
 const BuyCandyBadRequestCode int = 400
 
 /*
-BuyCandyBadRequest some error in input data
+BuyCandyBadRequest Bad request. A negative number
 
 swagger:response buyCandyBadRequest
 */

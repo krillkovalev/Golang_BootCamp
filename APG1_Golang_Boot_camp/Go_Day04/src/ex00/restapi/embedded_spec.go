@@ -78,7 +78,7 @@ func init() {
             }
           },
           "400": {
-            "description": "some error in input data",
+            "description": "Bad request. A negative number",
             "schema": {
               "type": "object",
               "properties": {
@@ -165,7 +165,7 @@ func init() {
             }
           },
           "400": {
-            "description": "some error in input data",
+            "description": "Bad request. A negative number",
             "schema": {
               "type": "object",
               "properties": {

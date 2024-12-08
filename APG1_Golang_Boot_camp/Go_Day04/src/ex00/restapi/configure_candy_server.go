@@ -3,14 +3,14 @@
 package restapi
 
 import (
+	"candy/restapi/operations"
 	"crypto/tls"
+	"fmt"
 	"net/http"
-	"slices"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"candy/restapi/operations"
 )
 
 //go:generate swagger generate server --target ../../ex00 --name CandyServer --spec ../swagger.yml --principal interface{}
@@ -19,11 +19,38 @@ func configureFlags(api *operations.CandyServerAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func buyCandy(money int, candyType string, candyCount int) error {
-	candies := []string{"CE", "AA", "NT", "DE", "YR",}
-	if candyCount < 0 || !slices.Contains(candies, candyType) {
-		return operations.NewBuyCandyBadRequest().WithPayload(&BuyCandyPaymentRequiredBody.)
+func buyCandy(params *operations.BuyCandyParams) middleware.Responder {
+	candy_type := *params.Order.CandyType
+	candy_count := *params.Order.CandyCount
+	money := *params.Order.Money
+	candies := map[string]int{"CE": 10, "AA": 15, "NT": 17, "DE": 21, "YR": 23}
+	val, ok := candies[candy_type]
+	if candy_count < 0 || !ok {
+		str := "wrong candyType or candyCount"
+		err := &operations.BuyCandyBadRequestBody{
+			Error: str,
+		}
+		return operations.NewBuyCandyBadRequest().WithPayload(err)
 	}
+	sum := int64(val) * money
+	if sum > money {
+		str := fmt.Sprintf("You need %d more money!", sum-*params.Order.Money)
+		err := &operations.BuyCandyPaymentRequiredBody{
+			Error: str,
+		}
+		return operations.NewBuyCandyPaymentRequired().WithPayload(err)
+	}
+
+	if sum <= money {
+		money = money - sum
+		res := &operations.BuyCandyCreatedBody{
+			Change: int64(money),
+			Thanks: "Thank you!",
+		}
+		return operations.NewBuyCandyCreated().WithPayload(res)
+	}
+
+	return nil
 }
 
 func configureAPI(api *operations.CandyServerAPI) http.Handler {
@@ -36,7 +63,6 @@ func configureAPI(api *operations.CandyServerAPI) http.Handler {
 	// Example:
 	// api.Logger = log.Printf
 
-
 	api.UseSwaggerUI()
 	// To continue using redoc as your UI, uncomment the following line
 	// api.UseRedoc()
@@ -47,7 +73,7 @@ func configureAPI(api *operations.CandyServerAPI) http.Handler {
 
 	if api.BuyCandyHandler == nil {
 		api.BuyCandyHandler = operations.BuyCandyHandlerFunc(func(params operations.BuyCandyParams) middleware.Responder {
-			return middleware.NotImplemented("operation operations.BuyCandy has not yet been implemented")
+			return buyCandy(&params)
 		})
 	}
 
