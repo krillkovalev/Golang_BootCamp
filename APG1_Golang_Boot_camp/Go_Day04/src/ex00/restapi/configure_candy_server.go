@@ -32,7 +32,7 @@ func buyCandy(params *operations.BuyCandyParams) middleware.Responder {
 		}
 		return operations.NewBuyCandyBadRequest().WithPayload(err)
 	}
-	sum := int64(val) * money
+	sum := int64(val) * candy_count
 	if sum > money {
 		str := fmt.Sprintf("You need %d more money!", sum-*params.Order.Money)
 		err := &operations.BuyCandyPaymentRequiredBody{
@@ -71,7 +71,7 @@ func configureAPI(api *operations.CandyServerAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	if api.BuyCandyHandler == nil {
+	if api.BuyCandyHandler != nil {
 		api.BuyCandyHandler = operations.BuyCandyHandlerFunc(func(params operations.BuyCandyParams) middleware.Responder {
 			return buyCandy(&params)
 		})
