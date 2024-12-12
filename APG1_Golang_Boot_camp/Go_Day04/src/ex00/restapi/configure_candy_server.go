@@ -5,12 +5,14 @@ package restapi
 import (
 	"candy/restapi/operations"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"net/http"
-
+	"os"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/lizrice/secure-connections/utils"
 )
 
 //go:generate swagger generate server --target ../../ex00 --name CandyServer --spec ../swagger.yml --principal interface{}
@@ -86,7 +88,17 @@ func configureAPI(api *operations.CandyServerAPI) http.Handler {
 
 // The TLS configuration before HTTPS server starts.
 func configureTLS(tlsConfig *tls.Config) {
-	// Make all necessary changes to the TLS configuration here.
+	cp := x509.NewCertPool()
+	data, _ := os.ReadFile("../ca/minica.pem")
+	cp.AppendCertsFromPEM(data)
+
+
+	tlsConfig.ClientCAs = cp
+	tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+	tlsConfig.GetCertificate = utils.CertReqFunc("cert.pem", "key.pem")
+	tlsConfig.VerifyPeerCertificate = utils.CertificateChains
+
+
 }
 
 // As soon as server is initialized but not run yet, this function will be called.

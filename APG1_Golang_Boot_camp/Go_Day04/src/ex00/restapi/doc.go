@@ -3,8 +3,8 @@
 // Package restapi Candy Server
 //
 //	Schemes:
-//	  http
-//	Host: localhost
+//	  https
+//	Host: candy.tld
 //	BasePath: /
 //	Version: 1.0.0
 //

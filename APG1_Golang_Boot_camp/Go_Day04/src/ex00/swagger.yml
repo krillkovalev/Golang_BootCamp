@@ -3,6 +3,9 @@ swagger: '2.0'
 info:
   version: 1.0.0
   title: Candy Server
+schemes:
+  - https
+host: candy.tld
 paths:
   /buy_candy:
     post:

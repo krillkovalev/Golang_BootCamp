@@ -5,3 +5,10 @@ APG1_Golang_Boot_camp/Go_Day03/materials/README.asciidoc
 APG1_Golang_Boot_camp/Go_Day03/src/ex00/data.csv
 APG1_Golang_Boot_camp/Go_Day03/src/ex00/Load
 APG1_Golang_Boot_camp/Go_Day03/src/ex01/Interface
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/ca/minica.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/client/cert.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/client/key.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/cmd/candy-server-server/cert.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/cmd/candy-server-server/key.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/restapi/cert.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex00/restapi/key.pem
