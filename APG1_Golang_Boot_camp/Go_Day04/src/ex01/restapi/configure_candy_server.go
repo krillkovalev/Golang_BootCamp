@@ -5,12 +5,16 @@ package restapi
 import (
 	"candy/restapi/operations"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"log"
 	"net/http"
-
+	"os"
+	"strconv"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/lizrice/secure-connections/utils"
 )
 
 //go:generate swagger generate server --target ../../ex00 --name CandyServer --spec ../swagger.yml --principal interface{}
@@ -42,12 +46,13 @@ func buyCandy(params *operations.BuyCandyParams) middleware.Responder {
 	}
 
 	if sum <= money {
+
 		money = money - sum
 		res := &operations.BuyCandyCreatedBody{
-			Change: int64(money),
-			Thanks: "Thank you!",
+			Message: fmt.Sprintf("Thank you! Your change is %s", strconv.Itoa(int(money))),
 		}
 		return operations.NewBuyCandyCreated().WithPayload(res)
+
 	}
 
 	return nil
@@ -86,7 +91,22 @@ func configureAPI(api *operations.CandyServerAPI) http.Handler {
 
 // The TLS configuration before HTTPS server starts.
 func configureTLS(tlsConfig *tls.Config) {
-	// Make all necessary changes to the TLS configuration here.
+	data, err := os.ReadFile("../../ca/minica.pem")
+	if err != nil {
+		log.Fatalf("Failed to read CA file: %v", err)
+	}
+	cp := x509.NewCertPool()
+	if !cp.AppendCertsFromPEM(data) {
+		log.Fatalf("Failed to append CA certificates: %v", err)
+	}
+
+
+	tlsConfig.ClientCAs = cp
+	tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+	tlsConfig.GetCertificate = utils.CertReqFunc("cert.pem", "key.pem")
+	tlsConfig.VerifyPeerCertificate = utils.CertificateChains
+
+
 }
 
 // As soon as server is initialized but not run yet, this function will be called.

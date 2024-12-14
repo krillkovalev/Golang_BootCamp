@@ -11,6 +11,7 @@ require (
 	github.com/go-openapi/swag v0.23.0
 	github.com/go-openapi/validate v0.24.0
 	github.com/jessevdk/go-flags v1.6.1
+	github.com/lizrice/secure-connections v0.0.0-20181003132801-0f21099c1edf
 	golang.org/x/net v0.31.0
 )
 

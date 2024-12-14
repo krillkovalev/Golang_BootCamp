@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/lizrice/secure-connections/utils"
+	`github.com/lizrice/secure-connections/utils`
 )
 
 type Candy struct {
@@ -44,7 +44,7 @@ func main() {
 		log.Fatalf("impossible to marshall")
 	}
 
-	request, err := http.NewRequest("-XPOST", "https://candy.ltd/buy_candy:3333", bytes.NewReader(marshalled))
+	request, err := http.NewRequest("POST", "https://candy.tld:3333/buy_candy", bytes.NewReader(marshalled))
 	if err != nil {
 		return
 	}
@@ -63,16 +63,27 @@ func main() {
 	if err != nil {
 		return
 	}
+	var data map[string]interface{}
+	if err := json.Unmarshal(body, &data); err != nil {
+		panic(err)
+	}
+
+	if resp.StatusCode == 201 {
+		res := data["message"]
+		fmt.Println(res)	
+	} else {
+		res := data["error"]
+		fmt.Println(res)
+	}
 
 
-	fmt.Printf("Status: %s Body: %s\n", resp.Status, string(body))
 
 }
 
 func getClient() *http.Client {
 	cp := x509.NewCertPool()
 	data, _ := os.ReadFile("../ca/minica.pem")
-	cp.AppendCertsFromPEM(data)
+	cp.AppendCertsFromPEM(data) 
 
 
 	config := &tls.Config{

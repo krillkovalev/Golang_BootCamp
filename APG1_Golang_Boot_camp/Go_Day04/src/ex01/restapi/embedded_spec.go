@@ -18,11 +18,15 @@ var (
 
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
+  "schemes": [
+    "https"
+  ],
   "swagger": "2.0",
   "info": {
     "title": "Candy Server",
     "version": "1.0.0"
   },
+  "host": "candy.tld",
   "paths": {
     "/buy_candy": {
       "post": {
@@ -68,10 +72,7 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "change": {
-                  "type": "integer"
-                },
-                "thanks": {
+                "message": {
                   "type": "string"
                 }
               }
@@ -105,11 +106,15 @@ func init() {
   }
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
+  "schemes": [
+    "https"
+  ],
   "swagger": "2.0",
   "info": {
     "title": "Candy Server",
     "version": "1.0.0"
   },
+  "host": "candy.tld",
   "paths": {
     "/buy_candy": {
       "post": {
@@ -155,10 +160,7 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "change": {
-                  "type": "integer"
-                },
-                "thanks": {
+                "message": {
                   "type": "string"
                 }
               }
