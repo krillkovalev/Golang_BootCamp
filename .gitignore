@@ -18,3 +18,6 @@ APG1_Golang_Boot_camp/Go_Day04/src/ex01/cmd/candy-server-server/cert.pem
 APG1_Golang_Boot_camp/Go_Day04/src/ex01/cmd/candy-server-server/key.pem
 APG1_Golang_Boot_camp/Go_Day04/src/ex01/ca/minica.pem
 APG1_Golang_Boot_camp/Go_Day04/src/ex01/client/candy-client
+APG1_Golang_Boot_camp/Go_Day04/src/ex02/ca/minica.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex02/cmd/candy-server-server/cert.pem
+APG1_Golang_Boot_camp/Go_Day04/src/ex02/cmd/candy-server-server/key.pem

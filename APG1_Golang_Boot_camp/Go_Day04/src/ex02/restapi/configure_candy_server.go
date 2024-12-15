@@ -10,12 +10,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/lizrice/secure-connections/utils"
-	
+	// #include "cowsay.h"
+	// #include <stdio.h>
+	// #include <stdlib.h>
+	// #include <string.h>
+	"C"
+	"unsafe"
 )
 
 //go:generate swagger generate server --target ../../ex00 --name CandyServer --spec ../swagger.yml --principal interface{}
@@ -47,10 +51,15 @@ func buyCandy(params *operations.BuyCandyParams) middleware.Responder {
 	}
 
 	if sum <= money {
-
 		money = money - sum
+		thanks := C.CString("Thank you!")
+		ptr := C.ask_cow(thanks)
+		str := C.GoString(ptr)
+		C.free(unsafe.Pointer(thanks))
+		fmt.Println(money)
 		res := &operations.BuyCandyCreatedBody{
-			Message: fmt.Sprintf("Thank you! Your change is %s", strconv.Itoa(int(money))),
+			Change: money,
+			Thanks: str,
 		}
 		return operations.NewBuyCandyCreated().WithPayload(res)
 
