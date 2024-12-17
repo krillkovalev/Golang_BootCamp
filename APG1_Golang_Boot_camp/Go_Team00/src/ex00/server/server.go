@@ -1,0 +1,52 @@
+package main
+
+import (
+	//"fmt"
+	"log"
+	"math/rand"
+	"military/military"
+	"net"
+	"time"
+
+	"github.com/google/uuid"
+	"google.golang.org/grpc"
+)
+
+type server struct {
+	military.UnimplementedDeviceServiceServer
+}
+
+func (s *server) StreamData(req *military.ConnectionRequest, stream grpc.ServerStreamingServer[military.DeviceData]) error{
+	mean := rand.Intn(-10+1-10) + 10
+	std := 0.3 + rand.Float64() * (1.5 - 0.3)
+	frequency := float64(mean) + std * rand.NormFloat64()
+	timestamp := time.Now().UTC().String()
+	
+	for i := 0; i < 10; i++ {
+		data := military.DeviceData{
+			SessionId: 			uuid.NewString(),
+			Frequency: 			frequency,
+			Timestamp: 			timestamp,
+		}
+		if err := stream.Send(&data); err != nil {
+			return err
+		}
+	}
+	
+	return nil
+
+}
+
+func main() {
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen 50051 port: %v", err)
+	}
+
+	s := grpc.NewServer()
+	military.RegisterDeviceServiceServer(s, &server{})
+	log.Printf("grpc server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
