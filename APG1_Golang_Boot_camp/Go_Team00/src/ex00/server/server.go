@@ -17,12 +17,15 @@ type server struct {
 }
 
 func (s *server) StreamData(req *military.ConnectionRequest, stream grpc.ServerStreamingServer[military.DeviceData]) error{
-	mean := rand.Intn(-10+1-10) + 10
-	std := 0.3 + rand.Float64() * (1.5 - 0.3)
-	frequency := float64(mean) + std * rand.NormFloat64()
 	timestamp := time.Now().UTC().String()
 	
 	for i := 0; i < 10; i++ {
+		rand.New(rand.NewSource(time.Now().UnixNano()))
+		min := -10.0
+		max := 10.0
+		mean := min + rand.Float64() * (max - min)
+		std := 0.3 + rand.Float64() * (1.5 - 0.3)
+		frequency := float64(mean) + std * rand.NormFloat64()
 		data := military.DeviceData{
 			SessionId: 			uuid.NewString(),
 			Frequency: 			frequency,

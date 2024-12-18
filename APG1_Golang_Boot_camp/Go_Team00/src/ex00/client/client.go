@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"military/military"
 	"time"
@@ -26,5 +27,17 @@ func main() {
 		log.Fatalf("error calling request Stream data: %v", err)
 	}
 
-	log.Printf("Response from server: %s", r)
+	for {
+		msg, err := r.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			log.Fatalf("Error receiving data: %v", err)
+		}
+
+		log.Printf("Received message: %+v", msg)
+	}
+
 }
