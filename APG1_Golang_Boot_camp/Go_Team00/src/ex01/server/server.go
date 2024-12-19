@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt"
 	"log"
 	"math/rand"
 	"military/military"
@@ -19,7 +18,7 @@ type server struct {
 func (s *server) StreamData(req *military.ConnectionRequest, stream grpc.ServerStreamingServer[military.DeviceData]) error{
 	timestamp := time.Now().UTC().String()
 	
-	for i := 0; i < 10; i++ {
+	for {
 		rand.New(rand.NewSource(time.Now().UnixNano()))
 		min := -10.0
 		max := 10.0
@@ -34,9 +33,10 @@ func (s *server) StreamData(req *military.ConnectionRequest, stream grpc.ServerS
 		if err := stream.Send(&data); err != nil {
 			return err
 		}
+
+		time.Sleep(100 * time.Millisecond)
 	}
 	
-	return nil
 
 }
 
