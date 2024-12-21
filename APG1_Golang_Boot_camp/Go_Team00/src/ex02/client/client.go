@@ -2,16 +2,40 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"io"
 	"log"
-	"military/military"
-	"flag"
 	"math"
+	"military/military"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+type Anomaly struct {
+	Session_ID string
+	Timestamp string
+	Frequency float64
+}
+
 const k float64 = 2.0
+
+func Init() *gorm.DB {
+	dbURL := "postgres://krillkovalev:pass@localhost:5432/anomally_dump"
+
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	a := Anomaly{}
+	db.AutoMigrate(&a)
+
+	return db
+}
 
 func main() {
 	flag_k := flag.Float64("k", k, "STD anomaly coefficient")
@@ -38,6 +62,8 @@ func main() {
 	dispersion := 0.
 	std := 0.
 
+	db := Init()
+
 	for {
 		msg, err := r.Recv()
 		if err == io.EOF {
@@ -50,18 +76,27 @@ func main() {
 		count++
 		frequency = msg.GetFrequency()
 		session_id := msg.GetSessionId()
+		timestamp := msg.GetTimestamp()
 		sum += frequency 
 		mean = sum / float64(count)
 		sq = (frequency - mean) * (frequency - mean) 
 		sumSq += sq
 		dispersion = sumSq / float64(count)
 		std = math.Sqrt(dispersion)
-
-		log.Printf("Session_ID: %s, Frequency: %f, Mean: %f, Standart Deviation: %f, Count of values procceded: %d", session_id, frequency, mean, std, count)
+		data := Anomaly {
+			Session_ID: 					session_id,
+			Timestamp: 						timestamp,
+			Frequency:						frequency,							
+		}
+		log.Printf("Session_ID: %s, Timestamp: %s Frequency: %f, Mean: %f, Standart Deviation: %f, Count of values procceded: %d", session_id, timestamp, frequency, mean, std, count)
 		// log.Printf("Received message: %+v", msg)
 
 		if math.Abs(frequency - mean) > *flag_k*std {
-			log.Printf("Anomaly Detected! Session_ID: %s, Frequency: %f, Mean: %f, Standart Deviation: %f", session_id, frequency, mean, std)
+			db.Table("anomalies")
+			if result := db.Create(&data); result.Error != nil {
+				fmt.Println(result.Error)
+			}
+			log.Printf("Anomaly Detected! Session_ID: %s, Timestamp: %s, Frequency: %f, Mean: %f, Standart Deviation: %f", session_id, timestamp, frequency, mean, std)
 		}
 	}
 
