@@ -23,19 +23,7 @@ type Anomaly struct {
 
 const k float64 = 2.0
 
-func Init() *gorm.DB {
-	dbURL := "postgres://krillkovalev:pass@localhost:5432/anomally_dump"
-
-	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-	a := Anomaly{}
-	db.AutoMigrate(&a)
-
-	return db
-}
+ 
 
 func main() {
 	flag_k := flag.Float64("k", k, "STD anomaly coefficient")
